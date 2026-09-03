@@ -1,0 +1,1 @@
+This is the first project for CS 2340: Objects & Design, at Georgia Institute of Technology under the instruction of Dr. Feijoo-Garcia. You may find the final deployed product [here](https://isabelsu.pythonanywhere.com/) (active until 10/3/26). 
