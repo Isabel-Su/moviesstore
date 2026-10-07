@@ -4,6 +4,9 @@ from django.contrib.auth import login as auth_login, authenticate, logout as aut
 from django.shortcuts import redirect
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
+from django.contrib.admin.views.decorators import staff_member_required
+from django.db.models import Sum, Value
+from django.db.models.functions import Coalesce
 
 # Create your views here.
 def login(request):
@@ -55,3 +58,24 @@ def orders(request):
     template_data['orders'] = request.user.order_set.all()
     return render(request, 'accounts/orders.html',
         {'template_data': template_data})
+
+@staff_member_required
+def dashboard(request):
+    template_data = {}
+    template_data['title'] = 'Admin Dashboard'
+    return render(request, 'accounts/dashboard.html', {'template_data': template_data})
+
+@staff_member_required
+def top_buyer(request):
+    template_data = {}
+    template_data['title'] = 'Top Buyer'
+    template_data['top_user'] = customers_by_movies_purchased().first()
+    return render(request, 'accounts/top_buyer.html', {'template_data': template_data})
+
+
+def customers_by_movies_purchased():
+    return (
+        User.objects.filter(is_staff=False)
+        .annotate(movies_purchased=Coalesce(Sum('order__item__quantity'), Value(0)))
+        .order_by('-movies_purchased', 'username')
+    )
