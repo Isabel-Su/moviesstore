@@ -5,7 +5,7 @@ from django.shortcuts import redirect
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.contrib.admin.views.decorators import staff_member_required
-from django.db.models import Sum, Value
+from django.db.models import Sum, Count, Value
 from django.db.models.functions import Coalesce
 
 # Create your views here.
@@ -79,6 +79,7 @@ def customers_by_movies_purchased():
         .annotate(movies_purchased=Coalesce(Sum('order__item__quantity'), Value(0)))
         .order_by('-movies_purchased', 'username')
     )
+
 @staff_member_required
 def buyers_list(request):
     template_data = {}
@@ -90,3 +91,12 @@ def buyers_list(request):
     template_data['users'] = users
     template_data['list_size'] = list_size
     return render(request, 'accounts/buyers_list.html', {'template_data': template_data})
+
+@staff_member_required
+def top_commenter(request):
+    template_data = {}
+    template_data['title'] = 'Top Commenter'
+    template_data['top_user'] = (User.objects.filter(is_staff=False)
+        .annotate(comments_posted=Count('review'))
+        .order_by('-comments_posted', 'username').first())
+    return render(request, 'accounts/top_commenter.html', {'template_data': template_data})
