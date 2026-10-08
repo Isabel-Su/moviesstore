@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="p-3">
+  <div class="container">
+    <div class="row mt-3">
+      <div class="col mx-auto mb-3">
+        <h2>Top Commenter</h2>
+        <hr />
+        {% if template_data.top_user and template_data.top_user.comments_posted > 0 %}
+            <table class="table table-bordered table-striped table-center">
+                <thead>
+                    <tr>
+                        <th scope="col">User</th>
+                        <th scope="col">Comments Posted</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>{{ template_data.top_user.username }}</td>
+                        <td>{{ template_data.top_user.comments_posted }}</td>
+                    </tr>
+                </tbody>
+            </table>
+        {% else %}
+        <p>No comments yet.</p>
+        {% endif %}
+        <a class="btn bg-dark text-white" href="{% url 'accounts.dashboard' %}">Back to Dashboard</a>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock content %}
