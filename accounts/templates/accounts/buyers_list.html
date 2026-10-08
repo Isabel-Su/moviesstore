@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="p-3">
+  <div class="container">
+    <div class="row mt-3">
+      <div class="col mx-auto mb-3">
+        <h2>Buyers List</h2>
+        <hr />
+        <form method= "GET" class="row g-2 mb-3">
+        <div class= "col-auto">
+        <input type="number" min="1" name="list_size" class="form-control" placeholder="list size (if blank all shown)"value="{{template_data.list_size}}">
+        <div class="col-auto">
+            <button type="submit" class="btn bg-dark text-white">Update</button>
+        </div>
+    </form>
+      <table class="table table-bordered table-striped text-center">
+        <thead>
+          <tr>
+            <th scope="col">Rank</th>
+            <th scope="col">User</th>
+            <th scope="col">Movies Puchased</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for user in template_data.users %}
+          <tr>
+            <td>{{ forloop.counter }}</td>
+            <td>{{ user.username }}</td>
+            <td>{{ user.movies_purchased }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+      <a class="btn bg-dark text-white" href="{% url 'accounts.dashboard' %}">Back to Dashboard</a>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock content %}

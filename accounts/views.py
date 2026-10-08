@@ -79,3 +79,14 @@ def customers_by_movies_purchased():
         .annotate(movies_purchased=Coalesce(Sum('order__item__quantity'), Value(0)))
         .order_by('-movies_purchased', 'username')
     )
+@staff_member_required
+def buyers_list(request):
+    template_data = {}
+    template_data['title'] = 'Buyers List'
+    users = customers_by_movies_purchased()
+    list_size = request.GET.get('list_size', '')
+    if list_size.isdigit() and int(list_size) > 0:
+        users = users[:int(list_size)]
+    template_data['users'] = users
+    template_data['list_size'] = list_size
+    return render(request, 'accounts/buyers_list.html', {'template_data': template_data})
