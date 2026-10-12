@@ -40,7 +40,24 @@
             <h6 class="card-subtitle mb-2 text-muted">
               {{ review.date }}
             </h6>
-            <p class="card-text">{{ review.comment }}</p>
+            <p>
+              {% if review.rating%}
+              <span class="text-warning" aria-hidden="true">
+                {% if review.rating == 1 %}★☆☆☆☆
+                {% elif review.rating == 2 %}★★☆☆☆ 
+                {% elif review.rating == 3 %}★★★☆☆ 
+                {% elif review.rating == 4 %}★★★★☆ 
+                {% elif review.rating == 5 %}★★★★★ 
+                {% endif %}
+                
+              </span>
+            <span>{{review.rating}}/5 stars </span>
+            {% else %}
+              <span class="text-muted"> Not rated</span>
+            {% endif %}
+          </p>
+            
+          <p class="card-text">{{ review.comment }}</p>
             {% if user.is_authenticated and user == review.user %}
             <a class="btn btn-primary" href="{% url 'movies.edit_review' id=template_data.movie.id review_id=review.id %}">Edit
             </a>
@@ -63,8 +80,23 @@
                   <form method="POST" action="{% url 'movies.create_review' id=template_data.movie.id %}">
                     {% csrf_token %}
                     <p>
+                      <label for="rating"> Rating:</label>
+                      <select name = "rating" id = "rating" class = "form-select" required>
+                        <option value="" selected disabled> Choose a rating</option>
+                        <option value="1">★☆☆☆☆ - 1 star</option>
+                        <option value="2">★★☆☆☆ - 2 stars</option>
+                        <option value="3">★★★☆☆ - 3 stars</option>
+                        <option value="4">★★★★☆ - 4 stars</option>
+                        <option value="5">★★★★★ - 5 stars</option>
+                  
+
+
+
+                      </select>
+                    </p>
+                    <p>
                       <label for="comment">Comment:</label>
-                      <textarea name="comment" required
+                      <textarea name="comment" required maxlength="255"
                       class="form-control"
                       id="comment"></textarea>
                     </p>
