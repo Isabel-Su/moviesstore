@@ -9,8 +9,23 @@
         <form method="POST">
           {% csrf_token %}
           <p>
+            <label for="rating"> Rating:</label>
+            <select name = "rating" id="rating" class="form-select" required>
+              <option value="" disabled
+              {% if not template_data.review.rating %}selected{% endif %}>
+              Choose a rating
+            </option>
+            {% for value in template_data.rating_choices %}
+              <option value="{{ value}}"
+                {% if template_data.review.rating == value %}selected{% endif %}>
+                {{ value}} star{{value|pluralize}}
+              </option>
+            {% endfor %}
+            </select>
+          </p>
+          <p>
             <label for="comment">Comment:</label>
-            <textarea name="comment" required class="form-control" id="comment">{{ template_data.review.comment }}</textarea>
+            <textarea name="comment" required maxlength="255" class="form-control" id="comment">{{ template_data.review.comment }}</textarea>
           </p>
           <div class="text-start">
             <button type="submit"

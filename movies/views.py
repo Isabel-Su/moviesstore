@@ -1,6 +1,7 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from .models import Movie, Review
 from django.contrib.auth.decorators import login_required
+from django.http import HttpResponseBadRequest
 
 # Create your views here.
 def index(request):
@@ -27,35 +28,54 @@ def show(request, id):
 
 @login_required
 def create_review(request, id):
-    if request.method == 'POST' and request.POST['comment'] != '':
-        movie = Movie.objects.get(id=id)
-        review = Review()
-        review.comment = request.POST['comment']
-        review.movie = movie
-        review.user = request.user
-        review.save()
+    if request.method != 'POST':
         return redirect('movies.show', id=id)
-    else:
-        return redirect('movies.show', id=id)
+    comment = request.POST.get('comment', '').strip()
+    rating = request.POST.get('rating', '')
+
+    if not comment or len(comment) > 255:
+        return HttpResponseBadRequest('Enter a comment between 1 and 255 characters')
+
+    if rating not in ('1','2','3','4','5'):
+        return HttpResponseBadRequest('Choose a rating from 1 to 5.')
+
+    movie = get_object_or_404(Movie, id=id)
+    Review.objects.create(
+        comment = comment,
+        rating = int(rating),
+        movie = movie,
+        user = request.user,
+
+    ) 
+    return redirect('movies.show', id=id)
 
 @login_required
 def edit_review(request, id, review_id):
-    review = get_object_or_404(Review, id=review_id)
+    review = get_object_or_404(Review, id=review_id, movie_id=id)
+    
     if request.user != review.user:
         return redirect('movies.show', id=id)
-    if request.method == 'GET':
-        template_data = {}
-        template_data['title'] = 'Edit Review'
-        template_data['review'] = review
-        return render(request, 'movies/edit_review.html',
-            {'template_data': template_data})
-    elif request.method == 'POST' and request.POST['comment'] != '':
-        review = Review.objects.get(id=review_id)
-        review.comment = request.POST['comment']
+
+    if request.method == 'POST':
+        comment = request.POST.get('comment', '').strip()
+        rating = request.POST.get('rating', '')
+
+        if not comment or len(comment) > 255:
+            return HttpResponseBadRequest('Enter a comment between 1 and 255 characters')
+        if rating not in ('1','2','3','4','5'):
+            return HttpResponseBadRequest('Choose a rating from 1 to 5.')
+    
+        review.comment = comment
+        review.rating = int(rating)
         review.save()
         return redirect('movies.show', id=id)
-    else:
-        return redirect('movies.show', id=id)
+
+    template_data = {'title': 'Edit Review',
+                     'review': review,
+                     'rating_choices': range(1,6),
+                     }
+    return render(request, 'movies/edit_review.html',
+                  {'template_data': template_data})
 
 @login_required
 def delete_review(request, id, review_id):
