@@ -7,6 +7,7 @@ from django.contrib.auth.models import User
 from django.contrib.admin.views.decorators import staff_member_required
 from django.db.models import Sum, Count, Value
 from django.db.models.functions import Coalesce
+from movies.models import Movie
 
 # Create your views here.
 def login(request):
@@ -100,3 +101,15 @@ def top_commenter(request):
         .annotate(comments_posted=Count('review'))
         .order_by('-comments_posted', 'username').first())
     return render(request, 'accounts/top_commenter.html', {'template_data': template_data})
+
+@staff_member_required
+def top_movies(request):
+    template_data = {}
+    template_data['title'] = 'Top Movies'
+    template_data['most_bought'] = (Movie.objects
+        .annotate(times_bought=Coalesce(Sum('item__quantity'), Value(0)))
+        .order_by('-times_bought', 'name').first())
+    template_data['most_reviewed'] = (Movie.objects
+            .annotate(times_reviewed=Count('review'))
+            .order_by('-times_reviewed', 'name').first())
+    return render(request, 'accounts/top_movies.html', {'template_data': template_data})

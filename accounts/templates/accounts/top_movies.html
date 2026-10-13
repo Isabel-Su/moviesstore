@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="p-3">
+  <div class="container">
+    <div class="row mt-3">
+      <div class="col mx-auto mb-3">
+        <h2>Top Movies</h2>
+        <hr />
+            <table class="table table-bordered table-striped text-center">
+                <thead>
+                    <tr>
+                        <th scope="col">Measure</th>
+                        <th scope="col">Movies</th>
+                        <th scope="col">Times</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Most Bought</td>
+                        <td>{{ template_data.most_bought.name|default:"-"}}</td>
+                        <td>{{ template_data.most_bought.times_bought|default:0}}</td>
+                    </tr>
+                    <tr>
+                        <td>Most Reviewed</td>
+                        <td>{{ template_data.most_reviewed.name|default:"-"}}</td>
+                        <td>{{ template_data.most_reviewed.times_bought|default:0}}</td>
+                    </tr>
+                </tbody>
+            </table>
+        <a class="btn bg-dark text-white" href="{% url 'accounts.dashboard' %}">Back to Dashboard</a>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock content %}
